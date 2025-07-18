@@ -1,6 +1,6 @@
 <template>
   <div class="todo-container">
-    <h2>🧾 할 일 관리 (내 서버)</h2>
+    <h2>🧾 할 일 관리 (수정 포함)</h2>
     <div class="form">
       <input v-model="newTodo" placeholder="할 일을 입력하세요" />
       <button @click="addTodo">추가</button>
@@ -10,7 +10,10 @@
         v-for="todo in todos"
         :key="todo.id"
         :content="todo.title"
+        :editing="editingId === todo.id"
         @delete="removeTodo(todo.id)"
+        @edit="startEdit(todo.id)"
+        @update="updateTodo(todo.id, $event)"
       />
     </ul>
   </div>
@@ -28,6 +31,7 @@ export default {
     return {
       newTodo: '',
       todos: [],
+      editingId: null, // 현재 수정 중인 todo의 ID
     };
   },
   mounted() {
@@ -35,35 +39,41 @@ export default {
   },
   methods: {
     async fetchTodos() {
-      try {
-        const res = await axios.get(API_URL);
-        this.todos = res.data;
-      } catch (e) {
-        alert('불러오기 실패');
-      }
+      const res = await axios.get(API_URL);
+      this.todos = res.data;
     },
     async addTodo() {
       const title = this.newTodo.trim();
       if (!title) return;
-
-      try {
-        const res = await axios.post(API_URL, {
-          title,
-          completed: false,
-        });
-        this.todos.unshift(res.data);
-        this.newTodo = '';
-      } catch (e) {
-        alert('추가 실패');
-      }
+      const res = await axios.post(API_URL, {
+        title,
+        completed: false,
+      });
+      this.todos.unshift(res.data);
+      this.newTodo = '';
     },
     async removeTodo(id) {
-      try {
-        await axios.delete(`${API_URL}/${id}`);
-        this.todos = this.todos.filter((todo) => todo.id !== id);
-      } catch (e) {
-        alert('삭제 실패');
+      await axios.delete(`${API_URL}/${id}`);
+      this.todos = this.todos.filter((todo) => todo.id !== id);
+    },
+    startEdit(id) {
+      this.editingId = id;
+    },
+    async updateTodo(id, newTitle) {
+      if (newTitle === null) {
+        // 취소
+        this.editingId = null;
+        return;
       }
+
+      const title = newTitle.trim();
+      if (!title) return;
+
+      await axios.put(`${API_URL}/${id}`, { title });
+      this.todos = this.todos.map((todo) =>
+        todo.id === id ? { ...todo, title } : todo
+      );
+      this.editingId = null;
     },
   },
 };
