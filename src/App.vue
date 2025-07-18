@@ -5,7 +5,6 @@
       <input v-model="newTodo" placeholder="할 일을 입력하세요" />
       <button @click="addTodo">추가</button>
     </div>
-    <button @click="fetchTodos">불러오기</button>
     <ul class="todo-list">
       <TodoItem
         v-for="todo in todos"
@@ -30,6 +29,9 @@ export default {
       newTodo: '',
       todos: [],
     };
+  },
+  mounted() {
+    this.fetchTodos();
   },
   methods: {
     async fetchTodos() {
