@@ -6,7 +6,10 @@
       <button @click="cancelEdit">취소</button>
     </template>
     <template v-else>
-      {{ content }}
+      <label class="label">
+        <input type="checkbox" :checked="completed" @change="$emit('toggle')" />
+        <span :class="{ done: completed }">{{ content }}</span>
+      </label>
       <button @click="$emit('edit')">✏️</button>
       <button @click="$emit('delete')">🗑️</button>
     </template>
@@ -18,6 +21,7 @@ export default {
   props: {
     content: String,
     editing: Boolean,
+    completed: Boolean,
   },
   data() {
     return {
@@ -49,7 +53,20 @@ export default {
   padding: 6px 0;
   border-bottom: 1px dashed #ddd;
 }
-.todo-item input {
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.done {
+  text-decoration: line-through;
+  color: gray;
+}
+
+.todo-item input[type='text'] {
   flex: 1;
   margin-right: 8px;
 }

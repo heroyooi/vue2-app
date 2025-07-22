@@ -150,7 +150,7 @@ export default {
   }
 }
 
-// 🌙 다크모드 대응
+// 다크모드 대응
 .dark {
   .todo-container {
     background: #1e1e1e;
