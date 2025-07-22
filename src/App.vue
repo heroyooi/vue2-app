@@ -24,7 +24,6 @@ import axios from 'axios';
 import TodoItem from './components/TodoItem.vue';
 
 const API_URL = '/api/todos';
-const userId = 'def456'; // 임시 사용자
 
 export default {
   components: { TodoItem },
@@ -32,15 +31,26 @@ export default {
     return {
       newTodo: '',
       todos: [],
-      editingId: null, // 현재 수정 중인 todo의 ID
+      editingId: null,
+      userId: null, // userId를 상태로 관리
     };
   },
   mounted() {
+    this.userId = this.getOrCreateUserId();
     this.fetchTodos();
   },
   methods: {
+    getOrCreateUserId() {
+      const KEY = 'todo-user-id';
+      let id = localStorage.getItem(KEY);
+      if (!id) {
+        id = 'user-' + Date.now();
+        localStorage.setItem(KEY, id);
+      }
+      return id;
+    },
     async fetchTodos() {
-      const res = await axios.get(`${API_URL}?user=${userId}`);
+      const res = await axios.get(`${API_URL}?user=${this.userId}`);
       this.todos = res.data;
     },
     async addTodo() {
@@ -49,13 +59,13 @@ export default {
       const res = await axios.post(API_URL, {
         title,
         completed: false,
-        userId,
+        userId: this.userId,
       });
       this.todos.unshift(res.data);
       this.newTodo = '';
     },
     async removeTodo(id) {
-      await axios.delete(`${API_URL}/${id}?user=${userId}`);
+      await axios.delete(`${API_URL}/${id}?user=${this.userId}`);
       this.todos = this.todos.filter((todo) => todo.id !== id);
     },
     startEdit(id) {
@@ -63,15 +73,13 @@ export default {
     },
     async updateTodo(id, newTitle) {
       if (newTitle === null) {
-        // 취소
         this.editingId = null;
         return;
       }
-
       const title = newTitle.trim();
       if (!title) return;
 
-      await axios.put(`${API_URL}/${id}`, { title, userId });
+      await axios.put(`${API_URL}/${id}`, { title, userId: this.userId });
       this.todos = this.todos.map((todo) =>
         todo.id === id ? { ...todo, title } : todo
       );
