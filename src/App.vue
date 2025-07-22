@@ -24,6 +24,7 @@ import axios from 'axios';
 import TodoItem from './components/TodoItem.vue';
 
 const API_URL = '/api/todos';
+const userId = 'def456'; // 임시 사용자
 
 export default {
   components: { TodoItem },
@@ -39,7 +40,7 @@ export default {
   },
   methods: {
     async fetchTodos() {
-      const res = await axios.get(API_URL);
+      const res = await axios.get(`${API_URL}?user=${userId}`);
       this.todos = res.data;
     },
     async addTodo() {
@@ -48,12 +49,13 @@ export default {
       const res = await axios.post(API_URL, {
         title,
         completed: false,
+        userId,
       });
       this.todos.unshift(res.data);
       this.newTodo = '';
     },
     async removeTodo(id) {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}?user=${userId}`);
       this.todos = this.todos.filter((todo) => todo.id !== id);
     },
     startEdit(id) {
@@ -69,7 +71,7 @@ export default {
       const title = newTitle.trim();
       if (!title) return;
 
-      await axios.put(`${API_URL}/${id}`, { title });
+      await axios.put(`${API_URL}/${id}`, { title, userId });
       this.todos = this.todos.map((todo) =>
         todo.id === id ? { ...todo, title } : todo
       );
