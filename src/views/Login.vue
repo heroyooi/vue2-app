@@ -25,8 +25,13 @@ export default {
           username: this.username,
           password: this.password,
         });
-        localStorage.setItem('token', res.data.token);
+
+        // ✅ Vuex에 로그인 상태 반영
+        this.$store.commit('login', res.data.token);
+
+        // ✅ 사용자명은 그대로 저장 가능
         localStorage.setItem('username', res.data.username);
+
         this.$router.push('/todos');
       } catch (e) {
         alert('로그인 실패');
