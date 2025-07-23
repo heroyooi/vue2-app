@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
+import { isTokenExpired } from '../utils/jwt';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
     isDark: localStorage.getItem('theme') === 'dark',
-    isLoggedIn: !!localStorage.getItem('token'),
+    isLoggedIn: false,
   },
   mutations: {
     toggleDark(state) {
@@ -22,7 +23,13 @@ export default new Vuex.Store({
       state.isLoggedIn = false;
     },
     syncLoginState(state) {
-      state.isLoggedIn = !!localStorage.getItem('token');
+      const token = localStorage.getItem('token');
+      if (!token || isTokenExpired(token)) {
+        localStorage.removeItem('token');
+        state.isLoggedIn = false;
+      } else {
+        state.isLoggedIn = true;
+      }
     },
   },
 });
