@@ -8,6 +8,7 @@
       </div>
 
       <div class="right">
+        <span v-if="isLoggedIn">👤 {{ username }} 님 환영합니다. </span>
         <button @click="toggleDark">
           {{ isDark ? '☀️ 밝은모드' : '🌙 다크모드' }}
         </button>
@@ -29,7 +30,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['isDark', 'isLoggedIn']),
+    ...mapState(['isDark', 'isLoggedIn', 'username']),
   },
   created() {
     this.syncLoginState(); // 새로고침 시 로그인 상태 복원
