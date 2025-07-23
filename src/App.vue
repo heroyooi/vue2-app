@@ -21,21 +21,21 @@
 </template>
 
 <script>
+import { store, mutations } from './store';
 export default {
   data() {
     return {
-      isDark: false,
       isLoggedIn: !!localStorage.getItem('token'),
     };
   },
-  created() {
-    const saved = localStorage.getItem('theme');
-    this.isDark = saved === 'dark';
+  computed: {
+    isDark() {
+      return store.isDark;
+    },
   },
   methods: {
     toggleDark() {
-      this.isDark = !this.isDark;
-      localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+      mutations.toggleTheme();
     },
     logout() {
       localStorage.removeItem('token');
