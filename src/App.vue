@@ -11,7 +11,7 @@
         <button @click="toggleDark">
           {{ isDark ? '☀️ 밝은모드' : '🌙 다크모드' }}
         </button>
-        <button v-if="isLoggedIn" @click="logout">🔒 로그아웃</button>
+        <button v-if="isLoggedIn" @click="handleLogout">🔒 로그아웃</button>
       </div>
     </header>
 
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { store, mutations } from './store';
+import { mapState, mapMutations } from 'vuex';
 export default {
   data() {
     return {
@@ -29,17 +29,15 @@ export default {
     };
   },
   computed: {
-    isDark() {
-      return store.isDark;
-    },
+    ...mapState(['isDark', 'isLoggedIn']),
+  },
+  created() {
+    this.syncLoginState(); // 새로고침 시 로그인 상태 복원
   },
   methods: {
-    toggleDark() {
-      mutations.toggleTheme();
-    },
-    logout() {
-      localStorage.removeItem('token');
-      this.isLoggedIn = false;
+    ...mapMutations(['toggleDark', 'logout', 'syncLoginState']),
+    handleLogout() {
+      this.logout();
       this.$router.push('/login');
     },
   },
