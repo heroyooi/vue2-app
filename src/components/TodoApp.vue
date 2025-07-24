@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '@/utils/axios';
 import TodoItem from './TodoItem.vue';
 
 const API_URL = '/api/todos';
@@ -41,18 +41,9 @@ export default {
     this.fetchTodos();
   },
   methods: {
-    // ✅ 공통 헤더
-    authHeader() {
-      return {
-        headers: {
-          Authorization: `Bearer ${this.token}`,
-        },
-      };
-    },
-
     async fetchTodos() {
       try {
-        const res = await axios.get(API_URL, this.authHeader());
+        const res = await axios.get(API_URL);
         this.todos = res.data;
       } catch (err) {
         console.error('할 일 불러오기 실패:', err);
@@ -66,7 +57,6 @@ export default {
         const res = await axios.post(
           API_URL,
           { title, completed: false },
-          this.authHeader()
         );
         this.todos.unshift(res.data);
         this.newTodo = '';
@@ -77,7 +67,7 @@ export default {
 
     async removeTodo(id) {
       try {
-        await axios.delete(`${API_URL}/${id}`, this.authHeader());
+        await axios.delete(`${API_URL}/${id}`);
         this.todos = this.todos.filter((todo) => todo.id !== id);
       } catch (err) {
         console.error('삭제 실패:', err);
@@ -96,7 +86,7 @@ export default {
       const title = newTitle.trim();
       if (!title) return;
       try {
-        await axios.put(`${API_URL}/${id}`, { title }, this.authHeader());
+        await axios.put(`${API_URL}/${id}`, { title });
         this.todos = this.todos.map((todo) =>
           todo.id === id ? { ...todo, title } : todo
         );
@@ -114,7 +104,6 @@ export default {
         await axios.put(
           `${API_URL}/${id}`,
           { completed: updated.completed },
-          this.authHeader()
         );
         this.todos = this.todos.map((todo) =>
           todo.id === id ? updated : todo
