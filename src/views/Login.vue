@@ -11,8 +11,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   name: 'LoginPage',
   data() {
@@ -21,15 +19,15 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        const res = await axios.post('/api/auth/login', {
+        const result = await this.$store.dispatch('auth/login', {
           username: this.username,
           password: this.password,
         });
-
-        this.$store.commit('auth/login', res.data.token);
-        this.$store.commit('auth/setUsername', res.data.username);
-
-        this.$router.push('/todos');
+        if (result.success) {
+          this.$router.push('/todos');
+        } else {
+          alert(result.message);
+        }
       } catch (e) {
         alert('로그인 실패');
       }
