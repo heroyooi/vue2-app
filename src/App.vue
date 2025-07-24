@@ -24,28 +24,19 @@
 <script>
 import { mapState, mapMutations } from 'vuex';
 export default {
-  data() {
-    return {
-      isLoggedIn: !!localStorage.getItem('token'),
-    };
-  },
   computed: {
-    ...mapState(['isDark', 'isLoggedIn', 'username']),
+    ...mapState('auth', ['isLoggedIn', 'username']),
+    ...mapState('theme', ['isDark']),
   },
   created() {
     this.syncLoginState(); // 새로고침 시 로그인 상태 복원
   },
   methods: {
-    ...mapMutations(['toggleDark', 'logout', 'syncLoginState']),
+    ...mapMutations('auth', ['logout', 'syncLoginState']),
+    ...mapMutations('theme', ['toggleDark']),
     handleLogout() {
       this.logout();
       this.$router.push('/login');
-    },
-  },
-  watch: {
-    // 로그인 성공 시에도 갱신될 수 있도록 localStorage 감시
-    $route() {
-      this.isLoggedIn = !!localStorage.getItem('token');
     },
   },
 };

@@ -26,8 +26,8 @@ export default {
           password: this.password,
         });
 
-        this.$store.commit('login', res.data.token);
-        this.$store.commit('setUsername', res.data.username);
+        this.$store.commit('auth/login', res.data.token);
+        this.$store.commit('auth/setUsername', res.data.username);
 
         this.$router.push('/todos');
       } catch (e) {
